@@ -66,14 +66,10 @@ class Gally_File
 	 */
 	public function isDirectory()
 	{
-		return is_dir($this->getAbsoluteName());
+		return is_dir($this->getFilename());
 	}
 	
-	/**
-	 * Lists all files if this file is a directory
-	 * @return array of Gally_File
-	 */
-	public function listFiles()
+	private function listItems($files, $directories)
 	{
 		if($this->isDirectory())
 		{
@@ -83,15 +79,33 @@ class Gally_File
 			{
 				if($filename !== "." && $filename !== "..")
 				{
-					$tmpfile = new Gally_File($this->getAbsoluteName() . "/" . $filename);
-					if(!$tmpfile->isDirectory()) // Only add files
+					$tmpfile = new Gally_File($this->getAbsoluteName() . $filename);
+					if($directories && $tmpfile->isDirectory()) {
 						$files[] = $tmpfile;
+					}
+					if($files && !$tmpfile->isDirectory()) {
+						$files[] = $tmpfile;
+					}
 				}
 			}
 			$dir->close();
 			return $files;	
 		}
-		throw new Exception('Can not list files on non directory ' . $this->getFilename());
+		return false;
+	}
+	
+	/**
+	 * Lists all files if this directory
+	 * @return array of Gally_File
+	 */
+	public function listFiles()
+	{
+		return $this->listItems(true, false);
+	}
+	
+	public function listAll()
+	{
+		return $this->listItems(true, true);
 	}
 	
 	/**
@@ -110,14 +124,30 @@ class Gally_File
 	public function getAbsoluteName()
 	{
 		if($this->exists())
-			return realpath($this->getFilename());
+			return realpath($this->getFilename()) . ($this->isDirectory() ? "/" : "");
 		else
 			return $this->getFilename();
 	}
 	
 	/**
+	 * Returns the simple name of the file without any directories,
+	 * if this file is not a directory
+	 * @return string The simple name of the file or false
+	 * if the simple name can't be determined
+	 */
+	public function getSimpleName()
+	{
+		if($this->exists() && !$this->isDirectory())
+		{
+			$fname = $this->getAbsoluteName();
+			return substr($fname, strrpos($fname, '/') + 1, strlen($fname));
+		}
+		return false;
+	}
+	
+	/**
 	 * Returns the file extension of this file as in the filename
-	 * @return string The files extension
+	 * @return string The file extension
 	 */
 	public function getExtension()
 	{
@@ -145,5 +175,19 @@ class Gally_File
 			$handle = $this->open("w");
 			fclose($handle);
 		}
+	}
+	
+	/**
+	 * Merge this directory with a given filename
+	 * @param $name The name of the file to append to this directory
+	 * @return The joined file instance or false it the
+	 * 		current file is not a directory 
+	 */
+	public function join($name)
+	{
+		if($this->isDirectory()) {
+			return new Gally_File($this->getAbsoluteName() . $name);
+		}
+		return false;
 	}
 }

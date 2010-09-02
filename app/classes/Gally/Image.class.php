@@ -117,29 +117,43 @@ class Gally_Image
 		$this->_image = $new_image;
 	}
 	
+	
 	/**
-	 * Turn this image into a rectangular with a given size, centering the
-	 * current content vertically or horizontally based on the current ratio
-	 * and fill with given color (default: white)
-	 * @param $size The size of the rectangle in pixels
-	 * @param $background The background color (array(red, green, blue))
+	 * Fit this image into a rectangle area with a given size in pixels.
+	 * If no background is given, the image will be resized so that it fits into
+	 * this rectangular area. If a background color is given as an array(red, green, blue)
+	 * the current image will be inserted horizontally or vertically centered into
+	 * a rectangular image with the given background color.
+	 * @param $size Size of the rectangle area
+	 * @param $background The background color to use
 	 * @return void
 	 */
-	public function rectangularize($size, $background = array(255, 255, 255))
+	public function rectangularize($size, $background = false)
 	{
-		$newimg = new Gally_Image(array("width" => $size, "height" => $size, "background" => $background));
 		$ratio = $this->width() / $this->height();
 		$xpos = $ypos = 0;
 		$width = $height = $size;
-		if($ratio > 1) { // width > height so center image vertically
+		if($ratio > 1) {
 			$height = round($size / $ratio);
-			$ypos = ($size / 2) - ($height / 2);
 		}
-		else { // width < height so center image horizontally
+		else {
 			$width = round($size * $ratio);
-			$xpos = ($size / 2) - ($width / 2);
 		}
-		imagecopyresampled($newimg->_image, $this->_image, $xpos, $ypos, 0, 0, $width, $height, $this->width(), $this->height());
-		$this->_image = $newimg->_image; 
+		
+		if(!$background) { // No background color given, just resize the image
+			$this->resize($width, $height);
+		}
+		else // Resize and insert into rectangular image with background color
+		{
+			$newimg = new Gally_Image(array("width" => $size, "height" => $size, "background" => $background));
+			if($ratio > 1) { // width > height so center image vertically
+				$ypos = ($size / 2) - ($height / 2);
+			}
+			else { // width < height so center image horizontally
+				$xpos = ($size / 2) - ($width / 2);
+			}
+			imagecopyresampled($newimg->_image, $this->_image, $xpos, $ypos, 0, 0, $width, $height, $this->width(), $this->height());
+			$this->_image = $newimg->_image;	
+		} 
 	}
 }
