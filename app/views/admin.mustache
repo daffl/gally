@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Gally - Admin</title>
+	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
+	<link rel="stylesheet" type="text/css" href="css/admin.css" />
+</head>
+<body>
+
+<div id="align">
+	<p style="text-align: right; margin-top: 0;"><a href="admin.php?action=logout">Logout</a></p>
+	<table class="images">
+	{{#urls}}
+	<tr>
+		<td><img src="{{thumb}}" alt="{{name}}" /></td>
+		<td>{{name}}</td>
+		<td>
+			<form action="admin.php" method="post">
+				<input type="hidden" name="name" value="{{name}}">
+				<input type="hidden" name="__method" value="delete">
+				<input type="image" src="css/delete.png" value="Delete" />
+			</form>
+		</td>
+	</tr>
+	{{/urls}}
+	</table>
+	<div class="box full" style="margin-top: 10px;">
+		<form enctype="multipart/form-data" action="admin.php" method="POST" class="padding">
+			<input type="hidden" name="MAX_FILE_SIZE" value="10240000" />
+			Choose a file to upload: <input name="upload" type="file" /><br />
+			<input type="submit" value="Upload File" />
+		</form>
+	</div>
+</div>
+</html>
