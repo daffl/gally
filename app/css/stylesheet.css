@@ -1,1 +1,5 @@
 @CHARSET "UTF-8";
+
+* { font-family: sans-serif; }
+.full { width: 100%; }
+.padding { padding: 10px; }

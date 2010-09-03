@@ -68,8 +68,12 @@ class Gally_File
 	{
 		return is_dir($this->getFilename());
 	}
-	
-	private function listItems($files, $directories)
+
+	/**
+	 * Lists all files if this directory
+	 * @return array of Gally_File
+	 */
+	public function listFiles()
 	{
 		if($this->isDirectory())
 		{
@@ -79,33 +83,14 @@ class Gally_File
 			{
 				if($filename !== "." && $filename !== "..")
 				{
-					$tmpfile = new Gally_File($this->getAbsoluteName() . $filename);
-					if($directories && $tmpfile->isDirectory()) {
-						$files[] = $tmpfile;
-					}
-					if($files && !$tmpfile->isDirectory()) {
-						$files[] = $tmpfile;
-					}
+					$tmpfile = $this->join($filename);
+					$files[] = $tmpfile;
 				}
 			}
 			$dir->close();
 			return $files;	
 		}
 		return false;
-	}
-	
-	/**
-	 * Lists all files if this directory
-	 * @return array of Gally_File
-	 */
-	public function listFiles()
-	{
-		return $this->listItems(true, false);
-	}
-	
-	public function listAll()
-	{
-		return $this->listItems(true, true);
 	}
 	
 	/**
@@ -190,4 +175,21 @@ class Gally_File
 		}
 		return false;
 	}
+	
+	/**
+	 * Reads the file contents and returns it as a string
+	 * @return string The file contents or false if file cannot be read
+	 */
+	public function read()
+	{
+		if($this->exists() && !$this->isDirectory()) {
+			return file_get_contents($this->getAbsoluteName());
+		}
+		return false;
+	}
+	
+	public function __toString()
+    {
+        return $this->getAbsoluteName();
+    }
 }

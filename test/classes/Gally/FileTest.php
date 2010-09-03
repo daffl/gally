@@ -34,6 +34,7 @@ class FileTest extends PHPUnit_Framework_TestCase
 	{
 		$testfile = new Gally_File('test/data');
 		$files = $testfile->listFiles();
+		$this->assertGreaterThan(0, sizeof($files), "File list should not be empty");
 		foreach($files as $file)
 		{
 			$this->assertTrue($file instanceof Gally_File);

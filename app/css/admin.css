@@ -13,3 +13,14 @@ body
 	padding: 10px;
 	background-color: #FFF;
 }
+
+table.images td, .box { border: 1px solid #B9B9B9; }
+table.images td { padding: 10px; }
+
+table.images
+{
+	width: 100%;
+	border-collapse: collapse;
+}
+
+input { margin-left: 10px; }

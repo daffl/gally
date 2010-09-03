@@ -3,27 +3,35 @@ class Gally_Admin extends Gally_Gallery
 {
 	protected $sizes;
 	
-	public function __construct($baseurl, Gally_File $basefolder, $folders = array("original" => "original", 
-		"view" => "view", "thumb" => "thumb"),
+	public function __construct($baseurl, Gally_File $basefolder, 
+		$types = array("view", "thumb"), 
 		$sizes = array("view" => 600, "thumb" => 100))
 	{
-		parent::__construct($baseurl, $basefolder, $folders);
+		parent::__construct($baseurl, $basefolder, $types);
+		if(!$this->basefolder->isWriteable())
+			throw new Exception("Folder '$basefolder' is not writeable! Cannot upload images.");
+		$this->sizes = $sizes;
 	}
 	
-	public function upload($name)
+	public function upload(Gally_File $tempfile, $name)
 	{
-		// $thumb = new Gally_Image()
-		// TODO upload functionality
+		if(!$tempfile->exists()) {
+			throw new Exception("File '$tempfile' does not exist!");
+		}
+		foreach($this->types as $type)
+		{
+			$image = new Gally_Image($tempfile);
+			$destfile = $this->basefolder->join($type)->join($name);
+			$image->rectangularize($this->sizes[$type]);
+			$image->save($destfile);
+		}
 	}
 	
 	public function delete($name)
 	{
-		$files = array();
-		// Delete from all folders
-		$files[] = $this->original->merge($name);
-		$files[] = $this->view->merge($name);
-		$files[] = $this->thumb->merge($name);
-		foreach($files as $file) {
+		foreach($this->types as $type)
+		{
+			$file = $this->basefolder->join($type)->join($name);
 			$file->delete();
 		}
 	}

@@ -30,7 +30,7 @@ class Gally_Image
 				$this->_image = imagecreatefrompng($fname);
 			}
 			if(!$this->_image)
-				throw new Exception($data->getAbsoluteName() . " is not a valid image resource!");
+				throw new Exception("File '$data' is not a valid image resource!");
 		}
 		elseif(is_array($data))
 		{

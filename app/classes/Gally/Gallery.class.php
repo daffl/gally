@@ -7,7 +7,7 @@ class Gally_Gallery
 	protected $types;
 	
 	public function __construct($baseurl, Gally_File $basefolder, 
-		$types = array("original", "view", "thumb"))
+		$types = array("view", "thumb"))
 	{
 		if(!$basefolder->isDirectory())
 			throw new Exception($basefolder->getFilename() . " is not a valid directory!");
@@ -30,7 +30,7 @@ class Gally_Gallery
 	
 	public function getUrls($name)
 	{
-		$result = array();
+		$result = array("name" => $name);
 		foreach($this->types as $type)
 		{
 			$result[$type] = $this->baseurl . $type . '/' . $name;
@@ -40,7 +40,7 @@ class Gally_Gallery
 	
 	public function listNames()
 	{
-		// TODO array intersect from all types
+		// TODO array intersect from all types to find only images that are in both
 		$names = array();
 		$folder = $this->basefolder->join($this->types[0]);
 		foreach($folder->listFiles() as $file)
@@ -51,5 +51,15 @@ class Gally_Gallery
 			}
 		}
 		return $names;
+	}
+	
+	public function urls()
+	{
+		$result = array();
+		foreach($this->listNames() as $name)
+		{
+			$result[] = $this->getUrls($name);
+		}
+		return $result;
 	}
 }
